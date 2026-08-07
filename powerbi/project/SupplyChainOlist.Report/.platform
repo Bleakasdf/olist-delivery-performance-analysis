@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Supply Chain Olist"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "62362f61-30a3-4c5b-a46d-886d12b14019"
+  }
+}

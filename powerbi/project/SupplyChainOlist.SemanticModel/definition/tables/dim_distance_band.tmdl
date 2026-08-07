@@ -1,0 +1,28 @@
+table dim_distance_band
+
+	column 'distance_band'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: distance_band
+		isHidden
+
+	column 'distance_band_sort'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: distance_band_sort
+		isHidden
+
+	column 'Distance' = IF(dim_distance_band[distance_band] = "unknown", "Unknown", dim_distance_band[distance_band])
+		dataType: string
+		summarizeBy: none
+		sortByColumn: distance_band_sort
+
+	partition dim_distance_band = m
+		mode: import
+		source =
+			let
+							Source = Csv.Document(File.Contents(#"DataFolder" & "\dim_distance_band.csv"), [Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+							Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+							Typed = Table.TransformColumnTypes(Headers, {{"distance_band", type text}, {"distance_band_sort", Int64.Type}}, "en-US")
+						in
+							Typed

@@ -1,0 +1,27 @@
+* text=auto
+
+*.csv text eol=lf
+*.ipynb text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.pbip text eol=lf
+*.pbir text eol=lf
+*.py text eol=lf
+*.sql text eol=lf
+*.tmdl text eol=lf
+*.txt text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+# Keep the portfolio focused on the case rather than GitHub language statistics.
+*.ipynb linguist-detectable=false
+*.py linguist-detectable=false
+*.sql linguist-detectable=false
+*.tmdl linguist-detectable=false
+*.json linguist-detectable=false
+*.pbip linguist-detectable=false
+*.pbir linguist-detectable=false
+
+*.png binary
+*.zip binary

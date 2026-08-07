@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Supply Chain Olist — model"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "fbc4e278-4330-4938-80ea-a4cb9ce3d20d"
+  }
+}
