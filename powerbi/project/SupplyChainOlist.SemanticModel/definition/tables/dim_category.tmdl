@@ -1,0 +1,16 @@
+table dim_category
+
+	column 'category_key'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: category_key
+
+	partition dim_category = m
+		mode: import
+		source =
+			let
+							Source = Csv.Document(File.Contents(#"DataFolder" & "\dim_category.csv"), [Delimiter=",", Columns=1, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+							Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+							Typed = Table.TransformColumnTypes(Headers, {{"category_key", type text}}, "en-US")
+						in
+							Typed

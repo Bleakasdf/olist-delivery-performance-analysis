@@ -1,0 +1,21 @@
+table dim_seller
+
+	column 'primary_seller_id'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: primary_seller_id
+
+	column 'seller_state'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: seller_state
+
+	partition dim_seller = m
+		mode: import
+		source =
+			let
+							Source = Csv.Document(File.Contents(#"DataFolder" & "\dim_seller.csv"), [Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+							Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+							Typed = Table.TransformColumnTypes(Headers, {{"primary_seller_id", type text}, {"seller_state", type text}}, "en-US")
+						in
+							Typed

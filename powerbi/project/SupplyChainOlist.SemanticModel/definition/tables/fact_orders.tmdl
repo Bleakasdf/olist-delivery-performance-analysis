@@ -1,0 +1,212 @@
+table fact_orders
+
+	/// Distinct delivered orders included in the analysis
+	measure 'Orders analyzed' = DISTINCTCOUNT(fact_orders[order_id])
+		formatString: #,##0
+
+	measure 'Late orders' = CALCULATE([Orders analyzed], fact_orders[late_flag] = 1)
+		formatString: #,##0
+
+	measure 'On-time orders' = CALCULATE([Orders analyzed], fact_orders[late_flag] = 0)
+		formatString: #,##0
+
+	measure 'Late rate %' = DIVIDE([Late orders], [Orders analyzed])
+		formatString: 0.0%
+
+	measure 'Late rate % (sufficient volume)' = IF([Orders analyzed] >= 100, [Late rate %])
+		formatString: 0.0%
+
+	measure 'Route order count' = IF([Orders analyzed] >= 150, [Orders analyzed])
+		formatString: #,##0
+
+	measure 'Route late orders' = IF([Orders analyzed] >= 150, [Late orders])
+		formatString: #,##0
+
+	measure 'Late rate' = IF([Orders analyzed] >= 150, [Late rate %])
+		formatString: 0.0%
+
+	measure 'Excess vs baseline' = IF([Orders analyzed] >= 150, [Excess late orders])
+		formatString: #,##0
+
+	measure 'On-time delivery OTD %' = DIVIDE([On-time orders], [Orders analyzed])
+		formatString: 0.0%
+
+	measure 'OTD target %' = 0.935
+		formatString: 0.0%
+
+	measure 'Average delay, days' = CALCULATE(AVERAGE(fact_orders[days_vs_promise]), fact_orders[late_flag] = 1)
+		formatString: 0.0
+
+	measure 'Total order value' = SUM(fact_orders[order_value])
+		formatString: R$ #,##0
+
+	measure 'Value of late orders' = CALCULATE([Total order value], fact_orders[late_flag] = 1)
+		formatString: R$ #,##0
+
+	measure 'Seller-stage late orders' = CALCULATE([Late orders], fact_orders[stage_bucket] = "late_seller_stage_involved")
+		formatString: #,##0
+
+	measure 'Post-handoff late orders' = CALCULATE([Late orders], fact_orders[stage_bucket] = "late_downstream_candidate")
+		formatString: #,##0
+
+	measure 'Classified late orders' = [Seller-stage late orders] + [Post-handoff late orders]
+		formatString: #,##0
+
+	measure 'Seller-stage share %' = DIVIDE([Seller-stage late orders], [Classified late orders])
+		formatString: 0.0%
+
+	measure 'Post-handoff share %' = DIVIDE([Post-handoff late orders], [Classified late orders])
+		formatString: 0.0%
+
+	measure 'Average review score' = AVERAGE(fact_orders[review_score])
+		formatString: 0.00
+
+	measure 'Average review score — on time' = CALCULATE([Average review score], fact_orders[late_flag] = 0)
+		formatString: 0.00
+
+	measure 'Average review score — late' = CALCULATE([Average review score], fact_orders[late_flag] = 1)
+		formatString: 0.00
+
+	measure 'Average review score gap' = [Average review score — on time] - [Average review score — late]
+		formatString: 0.00
+
+	measure 'Orders with reviews' = CALCULATE([Orders analyzed], fact_orders[reviewed_flag] = 1)
+		formatString: #,##0
+
+	measure 'Low review rate %' = DIVIDE(SUM(fact_orders[low_review_flag]), [Orders with reviews])
+		formatString: 0.0%
+
+	measure 'Low review rate — on time %' = CALCULATE([Low review rate %], fact_orders[late_flag] = 0)
+		formatString: 0.0%
+
+	measure 'Low review rate — late %' = CALCULATE([Low review rate %], fact_orders[late_flag] = 1)
+		formatString: 0.0%
+
+	measure 'Orders eligible for 90-day repeat window' = CALCULATE([Orders analyzed], fact_orders[repeat_90d_eligible] = 1)
+		formatString: #,##0
+
+	measure 'Repeat orders within 90 days' = CALCULATE(SUM(fact_orders[repeat_90d_flag]), fact_orders[repeat_90d_eligible] = 1)
+		formatString: #,##0
+
+	measure '90-day repeat order rate %' = DIVIDE([Repeat orders within 90 days], [Orders eligible for 90-day repeat window])
+		formatString: 0.00%
+
+	measure 'Baseline late rate %' = CALCULATE([Late rate %], REMOVEFILTERS(dim_route))
+		formatString: 0.0%
+
+	measure 'Excess late orders' = MAX(0, [Late orders] - [Orders analyzed] * [Baseline late rate %])
+		formatString: #,##0
+
+	measure 'Scenario: prevented late orders' = [Late orders] * SELECTEDVALUE(scenario_assumptions[Late-rate reduction], 0.2)
+		formatString: #,##0
+
+	measure 'Scenario: protected order value' = [Value of late orders] * SELECTEDVALUE(scenario_assumptions[Late-rate reduction], 0.2)
+		formatString: R$ #,##0
+
+	column 'order_id'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column 'purchase_date'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: purchase_date
+
+	column 'primary_seller_id'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: primary_seller_id
+
+	column 'route_key'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: route_key
+
+	column 'primary_category'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: primary_category
+
+	column 'distance_band'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: distance_band
+
+	column 'late_flag'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: late_flag
+
+	column 'stage_bucket'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: stage_bucket
+
+	column 'seller_count'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: seller_count
+
+	column 'days_vs_promise'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: days_vs_promise
+
+	column 'distance_km'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: distance_km
+
+	column 'freight_value'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: freight_value
+
+	column 'order_value'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: order_value
+
+	column 'review_score'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: review_score
+
+	column 'reviewed_flag'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: reviewed_flag
+
+	column 'low_review_flag'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: low_review_flag
+
+	column 'repeat_90d_eligible'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: repeat_90d_eligible
+
+	column 'repeat_90d_flag'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: repeat_90d_flag
+
+	column 'Delivery status' = IF(fact_orders[late_flag] = 1, "Late", "On time")
+		dataType: string
+		summarizeBy: none
+
+	column 'Likely delay stage' = SWITCH(fact_orders[stage_bucket], "late_seller_stage_involved", "Seller stage", "late_downstream_candidate", "Post-handoff", "on_time", "On time", "Unclassified")
+		dataType: string
+		summarizeBy: none
+
+	partition fact_orders = m
+		mode: import
+		source =
+			let
+							Source = Csv.Document(File.Contents(#"DataFolder" & "\fact_orders.csv"), [Delimiter=",", Columns=30, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+							Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+							Typed = Table.TransformColumnTypes(Headers, {{"order_id", type text}, {"purchase_date", type date}, {"primary_seller_id", type text}, {"route_key", type text}, {"primary_category", type text}, {"distance_band", type text}, {"late_flag", Int64.Type}, {"stage_bucket", type text}, {"seller_count", type number}, {"days_vs_promise", type number}, {"distance_km", type number}, {"freight_value", type number}, {"order_value", type number}, {"review_score", type number}, {"reviewed_flag", Int64.Type}, {"low_review_flag", Int64.Type}, {"repeat_90d_eligible", Int64.Type}, {"repeat_90d_flag", Int64.Type}}, "en-US")
+						in
+							Typed

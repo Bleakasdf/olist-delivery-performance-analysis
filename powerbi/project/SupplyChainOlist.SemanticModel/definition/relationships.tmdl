@@ -1,0 +1,19 @@
+relationship 'Orders — Date'
+	fromColumn: fact_orders.purchase_date
+	toColumn: dim_date.date
+
+relationship 'Orders — Seller'
+	fromColumn: fact_orders.primary_seller_id
+	toColumn: dim_seller.primary_seller_id
+
+relationship 'Orders — Route'
+	fromColumn: fact_orders.route_key
+	toColumn: dim_route.route_key
+
+relationship 'Orders — Category'
+	fromColumn: fact_orders.primary_category
+	toColumn: dim_category.category_key
+
+relationship 'Orders — Distance'
+	fromColumn: fact_orders.distance_band
+	toColumn: dim_distance_band.distance_band

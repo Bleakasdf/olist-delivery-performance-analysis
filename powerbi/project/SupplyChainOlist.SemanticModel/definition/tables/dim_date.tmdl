@@ -1,0 +1,53 @@
+table dim_date
+
+	column 'date'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: date
+
+	column 'year'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: year
+
+	column 'quarter'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: quarter
+
+	column 'month_number'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: month_number
+
+	column 'month_name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: month_name
+
+	column 'year_month'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: year_month
+		isHidden
+
+	column 'year_month_sort'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: year_month_sort
+		isHidden
+
+	column 'Month' = dim_date[year_month]
+		dataType: string
+		summarizeBy: none
+		sortByColumn: year_month_sort
+
+	partition dim_date = m
+		mode: import
+		source =
+			let
+							Source = Csv.Document(File.Contents(#"DataFolder" & "\dim_date.csv"), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+							Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+							Typed = Table.TransformColumnTypes(Headers, {{"date", type date}, {"year", Int64.Type}, {"quarter", type text}, {"month_number", Int64.Type}, {"month_name", type text}, {"year_month", type text}, {"year_month_sort", Int64.Type}}, "en-US")
+						in
+							Typed

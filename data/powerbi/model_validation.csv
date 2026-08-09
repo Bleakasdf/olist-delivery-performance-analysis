@@ -1,0 +1,2 @@
+﻿fact_rows,distinct_orders,late_orders,otd,order_value,date_keys_unique,seller_keys_unique,route_keys_unique,category_keys_unique
+96281,96281,7822,0.91875863358295,15390683.77,True,True,True,True

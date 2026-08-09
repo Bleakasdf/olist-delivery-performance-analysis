@@ -1,0 +1,41 @@
+table dim_route
+
+	column 'route_key'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: route_key
+		isHidden
+
+	column 'seller_state'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: seller_state
+		isHidden
+
+	column 'customer_state'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: customer_state
+		isHidden
+
+	column 'Route' = dim_route[route_key]
+		dataType: string
+		summarizeBy: none
+
+	column 'Seller state' = dim_route[seller_state]
+		dataType: string
+		summarizeBy: none
+
+	column 'Customer state' = dim_route[customer_state]
+		dataType: string
+		summarizeBy: none
+
+	partition dim_route = m
+		mode: import
+		source =
+			let
+							Source = Csv.Document(File.Contents(#"DataFolder" & "\dim_route.csv"), [Delimiter=",", Columns=3, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+							Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+							Typed = Table.TransformColumnTypes(Headers, {{"route_key", type text}, {"seller_state", type text}, {"customer_state", type text}}, "en-US")
+						in
+							Typed

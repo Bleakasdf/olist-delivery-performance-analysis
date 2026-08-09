@@ -1,0 +1,6 @@
+﻿distance_band,distance_band_sort
+<250 km,1
+250-749 km,2
+750-1499 km,3
+1500+ km,4
+unknown,5

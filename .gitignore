@@ -1,0 +1,10 @@
+.python-packages/
+.edge-headless/
+__pycache__/
+*.pyc
+data/raw/
+data/processed/
+.ipynb_checkpoints/
+powerbi/project/**/.pbi/
+powerbi/mockups/
+outputs/

@@ -1,0 +1,73 @@
+table scenario_assumptions
+
+	column 'relative_late_reduction'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: relative_late_reduction
+		isHidden
+
+	column 'attributable_share_of_repeat_gap'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: attributable_share_of_repeat_gap
+		isHidden
+
+	column 'late_orders_reduced'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: late_orders_reduced
+		isHidden
+
+	column 'protected_order_value'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: protected_order_value
+		isHidden
+
+	column 'estimated_incremental_repeat_orders'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: estimated_incremental_repeat_orders
+		isHidden
+
+	column 'estimated_incremental_repeat_gmv'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: estimated_incremental_repeat_gmv
+		isHidden
+
+	column 'scenario_note'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: scenario_note
+		isHidden
+
+	column 'Late-rate reduction' = scenario_assumptions[relative_late_reduction]
+		dataType: double
+		summarizeBy: none
+		formatString: 0%
+
+	column 'Share attributed to repeat gap' = scenario_assumptions[attributable_share_of_repeat_gap]
+		dataType: double
+		summarizeBy: none
+		formatString: 0%
+
+	column 'Prevented late orders' = scenario_assumptions[late_orders_reduced]
+		dataType: double
+		summarizeBy: none
+		formatString: #,##0
+
+	column 'Protected order value' = scenario_assumptions[protected_order_value]
+		dataType: double
+		summarizeBy: none
+		formatString: R$ #,##0
+
+	partition scenario_assumptions = m
+		mode: import
+		source =
+			let
+							Source = Csv.Document(File.Contents(#"DataFolder" & "\scenario_assumptions.csv"), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+							Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+							Typed = Table.TransformColumnTypes(Headers, {{"relative_late_reduction", type number}, {"attributable_share_of_repeat_gap", type number}, {"late_orders_reduced", type number}, {"protected_order_value", type number}, {"estimated_incremental_repeat_orders", type number}, {"estimated_incremental_repeat_gmv", type number}, {"scenario_note", type text}}, "en-US")
+						in
+							Typed
