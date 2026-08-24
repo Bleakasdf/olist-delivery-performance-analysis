@@ -206,6 +206,12 @@ Run a focused pilot on high-volume routes and sellers with the most excess late 
 
 Carrier identifiers and detailed logistics events are required before assigning a root cause within the post-handoff stage.
 
+## Pilot readiness
+
+The 20% relative reduction target is now tied to an evaluation design. From the historical 8.12% late-delivery baseline, a naive independent-order calculation requires approximately **4,029 orders per arm**. This is a lower bound: the intervention should be assigned by route-seller cluster, so final sizing must apply a design effect estimated from the pre-period.
+
+The proposed matched-cluster randomization, difference-in-differences analysis, diagnostics, guardrails, and scaling rule are documented in [PILOT_PLAN.md](PILOT_PLAN.md). The plan deliberately avoids claiming carrier responsibility from data that contain no carrier identifier.
+
 ## Data and tools
 
 - Dataset: [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
@@ -236,6 +242,7 @@ sql/                   Data model and analytical queries
 python scripts/build_database.py
 python scripts/run_analysis.py
 python scripts/build_powerbi_assets.py
+python scripts/plan_pilot.py
 ```
 
 4. Open `powerbi/project/SupplyChainOlist.pbip` in Power BI Desktop.
@@ -247,3 +254,4 @@ python scripts/build_powerbi_assets.py
 - Seller-stage classification is limited to single-seller orders.
 - Customer-impact comparisons are observational and do not establish causality.
 - Historical results from 2016–2018 are not a current operational benchmark.
+
